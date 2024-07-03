@@ -80,6 +80,70 @@ We’re going to use Systemd, which is a system and service manager for Linux op
 ```bash
 sudo vim /etc/systemd/system/prometheus.service
 ```
+`prometheus.service`
+
+```bash
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=500
+StartLimitBurst=5
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/bin/prometheus \
+  --config.file=/etc/prometheus/prometheus.yml \
+  --storage.tsdb.path=/data \
+  --web.console.templates=/etc/prometheus/consoles \
+  --web.console.libraries=/etc/prometheus/console_libraries \
+  --web.listen-address=0.0.0.0:9090 \
+  --web.enable-lifecycle
+[Install]
+WantedBy=multi-user.target
+
+```
+# Prometheus and Systemd Configuration
+
+## Systemd Options
+
+- **Restart**: Configures when the service should be restarted. For example, the service can be restarted if it crashes, is stopped, or times out.
+
+- **RestartSec**: Specifies the time to wait before restarting a service. If the service stops, Systemd will wait this amount of time before attempting to start it again.
+
+- **User and Group**: Defines the Linux user and group under which the Prometheus process should run. This is important for managing permissions and security.
+
+## Prometheus Options
+
+- **–config.file=/etc/prometheus/prometheus.yml**: Path to the main Prometheus configuration file. It tells Prometheus where to find its settings.
+
+- **–storage.tsdb.path=/data**: Location where Prometheus should store its data on disk.
+
+- **–web.listen-address=0.0.0.0:9090**: Configures Prometheus to listen for web requests on all network interfaces at port 9090. If using a proxy like nginx to redirect requests to Prometheus, you might set this to only listen on localhost.
+
+- **–web.enable-lifecycle**: Enables management of Prometheus, such as reloading its configuration, without needing to restart the service.
+
+then automatically start the Prometheus after reboot, run enable.
+
+```bash
+sudo systemctl enable prometheus
+sudo systemctl start prometheus
+```
 
 
+Suppose you encounter any issues with Prometheus or are unable to start it. The easiest way to find the problem is to use the journalctl command and search for errors.
+
+```bash
+journalctl -u prometheus -f --no-pager
+```
+Now we can try to access it via the browser. I’m going to be using the IP address of the Ubuntu server. You need to append port 9090 to the IP.
+```bash
+<public-ip:9090>
+```
+
+
+![image](https://github.com/mayaworld13/prometheus_monitoring/assets/127987256/aca5267e-d3cc-413c-ad56-f0b76b5d7c35)
 

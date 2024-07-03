@@ -26,7 +26,7 @@ By creating a separate user for Prometheus, you enhance security and make it eas
 
 ## Installing Prometheus
 
-Let’s check the latest version of Prometheus from the [download](#https://prometheus.io/download/) page.
+Let’s check the latest version of Prometheus from the [download](https://prometheus.io/download/) page.
 
 You can use the curl or wget command to download Prometheus.
 ```bash
